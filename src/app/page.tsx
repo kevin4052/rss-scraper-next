@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 type Feed = {
@@ -10,18 +11,32 @@ type Feed = {
 };
 
 export default async function Home() {
-    const data = await fetch("http://localhost:8000/v1/feeds");
-    const feeds: Feed[] = await data.json();
+    let data;
+    let feeds: Feed[];
+
+    try {
+        data = await fetch("http://localhost:8000/v1/feeds");
+    } catch (error) {
+        console.log("failed to fetch feed data: ", error);
+    }
+
+    if (data?.ok) {
+        feeds = await data.json();
+    }
 
     return (
-        <ul>
-            {feeds.map((feed: Feed) => (
-                <li key={feed.id}>
-                    <Link href={feed.url} target="_blank">
-                        {feed.name}
-                    </Link>
-                </li>
-            ))}
-        </ul>
+        <>
+            <Button>click me</Button>
+            <ul>
+                {data?.ok &&
+                    feeds.map((feed: Feed) => (
+                        <li key={feed.id}>
+                            <Link href={feed.url} target="_blank">
+                                {feed.name}
+                            </Link>
+                        </li>
+                    ))}
+            </ul>
+        </>
     );
 }
